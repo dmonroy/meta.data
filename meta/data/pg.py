@@ -1,5 +1,4 @@
 import asyncio
-import os
 from urllib.parse import urlsplit
 
 import aiopg
