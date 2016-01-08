@@ -16,7 +16,9 @@ setup_args = dict(
     ],
     install_requires=[
         'aiopg',
+        'attrdict',
         'chilero',
+        'pyyaml',
         'schema_migrations',
     ]
 )
