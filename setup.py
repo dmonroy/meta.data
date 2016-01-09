@@ -20,7 +20,12 @@ setup_args = dict(
         'chilero',
         'pyyaml',
         'schema_migrations',
-    ]
+    ],
+    entry_points = {
+        'console_scripts': [
+            'meta.data = meta.data:main',
+        ],
+    },
 )
 
 
