@@ -1,6 +1,5 @@
-import json
-
 import psycopg2
+from psycopg2._json import Json
 from pytest import fixture
 
 from meta.data.pg import parse_pgurl
@@ -30,6 +29,6 @@ def test_insert(conn):
         tags=['test', 'insert']
     )
     c = conn.cursor()
-    c.execute("insert into meta (data) values (%s)", (json.dumps(data),))
+    c.execute("insert into meta (data) values (%s)", (Json(data),))
     c.execute("select count(1) from meta where data ->> 'source' = 'test_insert'")
     assert c.fetchone()[0] == 1
