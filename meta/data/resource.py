@@ -15,9 +15,7 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(obj, datetime.datetime) \
                 or isinstance(obj, datetime.date):
 
-            return obj.isoformat(sep=' ')
-
-        return None
+            return obj.isoformat()
 
 
 class PGResource(web.Resource):
