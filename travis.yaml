@@ -1,9 +1,0 @@
-sudo: false
-language: python
-addons:
-  postgresql: "9.4"
-python:
-  - "3.4"
-  - "3.5"
-install: pip install tox-travis
-script: tox
