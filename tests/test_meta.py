@@ -31,6 +31,7 @@ class TestMeta(WebTestCase):
         )
 
         self.assertEqual(resp.status, 400)
+        resp.close()
 
     @asynctest
     def test_wrong_create(self):
@@ -42,6 +43,7 @@ class TestMeta(WebTestCase):
         )
 
         self.assertEqual(resp.status, 400)
+        resp.close()
 
     @asynctest
     def test_valid_create(self):
@@ -68,3 +70,31 @@ class TestMeta(WebTestCase):
         self.assertIn('created', body)
 
         self.assertEqual(body['data'], data['data'])
+        resp.close()
+        resp2.close()
+
+    @asynctest
+    def test_delete(self):
+        data = dict(
+            data=dict(a=1, b=2)
+        )
+        resp = yield from request(
+            'POST', self.full_url('/'), loop=self.loop, data=json.dumps(data)
+        )
+
+        location = resp.headers['Location']
+
+        resp2 = yield from request(
+            'DELETE', self.full_url(location), loop=self.loop
+        )
+
+        self.assertEqual(resp2.status, 200)
+
+        resp3 = yield from request(
+            'GET', self.full_url(location), loop=self.loop
+        )
+
+        self.assertEqual(resp3.status, 404)
+        resp.close()
+        resp2.close()
+        resp3.close()

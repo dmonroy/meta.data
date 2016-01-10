@@ -223,6 +223,16 @@ class Resource(PGResource):
             headers=(('Location', '/{id}'.format(id=id)),)
         )
 
+    def destroy(self, id):
+
+        with (yield from self.get_cursor()) as cur:
+            yield from cur.execute(
+                'DELETE FROM meta WHERE id = %s', (id,)
+            )
+            print(dir(cur))
+
+        return web.Response(status=200)
+
     def serialize(self, obj):
         return dict(
             id=obj[0],
