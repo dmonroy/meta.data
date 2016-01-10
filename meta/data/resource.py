@@ -5,9 +5,8 @@ import os
 
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPNotFound
 from chilero import web
-from psycopg2._json import Json
-
 from meta.data.pg import create_pool
+from psycopg2._json import Json
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -214,7 +213,8 @@ class Resource(PGResource):
 
         with (yield from self.get_cursor()) as cur:
             yield from cur.execute(
-                'INSERT INTO meta (data) VALUES (%s) returning id', (Json(data['data']),)
+                'INSERT INTO meta (data) VALUES (%s) returning id',
+                (Json(data['data']),)
             )
             id = (yield from cur.fetchone())[0]
 
