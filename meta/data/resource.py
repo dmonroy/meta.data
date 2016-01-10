@@ -3,7 +3,10 @@ import datetime
 import json
 import os
 
+from aiohttp.web_exceptions import HTTPBadRequest, HTTPNotFound
 from chilero import web
+from psycopg2._json import Json
+
 from meta.data.pg import create_pool
 
 
@@ -189,9 +192,40 @@ class Resource(PGResource):
         index = yield from self.do_index()
         return self.response(index)
 
+    def show(self, id):
+        with (yield from self.get_cursor()) as cur:
+            query = '{query} WHERE id=%s'.format(query=self.LIST_QUERY)
+            yield from cur.execute(query, (id,))
+            if cur.rowcount == 0:
+                raise HTTPNotFound()
+
+            obj = self.serialize((yield from cur.fetchone()))
+
+        return self.response(body=obj)
+
+    def new(self):
+        try:
+            data = yield from self.request.json()
+        except ValueError:
+            raise HTTPBadRequest()
+
+        if set(data.keys()) != {'data'}:
+            raise HTTPBadRequest()
+
+        with (yield from self.get_cursor()) as cur:
+            yield from cur.execute(
+                'INSERT INTO meta (data) VALUES (%s) returning id', (Json(data['data']),)
+            )
+            id = (yield from cur.fetchone())[0]
+
+        return web.Response(
+            status=201,
+            headers=(('Location', '/{id}'.format(id=id)),)
+        )
+
     def serialize(self, obj):
         return dict(
             id=obj[0],
-            meta=obj[1],
+            data=obj[1],
             created=obj[2]
         )
